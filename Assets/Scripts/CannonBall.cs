@@ -1,11 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UnityCommon.ResourceManagement;
 using UnityEngine;
 
 
 [RequireComponent(typeof(Rigidbody))]
-public class CannonBall : MonoBehaviour
+public class CannonBall : MonoBehaviour, IPoolObject
 {
+	public Pool<CannonBall> Pool { get; set; }
 
 
 	[SerializeField] private Rigidbody rb;
@@ -21,9 +23,16 @@ public class CannonBall : MonoBehaviour
 	}
 
 
-	private void Awake()
+	private void OnEnable()
 	{
-		Destroy(this.gameObject, 4f);
+		StartCoroutine(WaitAndPool());
+	}
+
+	IEnumerator WaitAndPool()
+	{
+		yield return new WaitForSeconds(4f);
+		
+		Pool.Return(this);
 	}
 
 
@@ -41,4 +50,13 @@ public class CannonBall : MonoBehaviour
 		this.horizontalForce = horizontalForce;
 	}
 
+	public void OnPooled()
+	{
+		this.gameObject.SetActive(false);
+	}
+
+	public void OnRecycled()
+	{
+		this.gameObject.SetActive(true);
+	}
 }

@@ -15,7 +15,6 @@ namespace UnityCommon.UI.EventBinding
 
 		public override void OnEventFired()
 		{
-			Debug.Log("Text: " + variable.Value);
 
 			var format = this.format.Trim();
 

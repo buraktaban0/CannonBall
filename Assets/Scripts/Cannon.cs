@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityCommon.Events;
+using UnityCommon.ResourceManagement;
 using UnityEngine;
 
 [RequireComponent(typeof(LineRenderer))]
@@ -46,6 +47,7 @@ public class Cannon : MonoBehaviour
 	private Vector3 initialVelocity = Vector3.zero;
 	private Vector3 horizontalForce = Vector3.zero;
 
+	private Pool<CannonBall> cannonBallPool;
 
 
 	private void OnValidate()
@@ -61,6 +63,9 @@ public class Cannon : MonoBehaviour
 	{
 		_t = this.transform;
 		camTransform = Camera.main.transform;
+
+		var factory = new CannonBallFactory("CannonBall");
+		cannonBallPool = new Pool<CannonBall>(10, factory);
 	}
 
 
@@ -166,8 +171,12 @@ public class Cannon : MonoBehaviour
 
 		lineRenderer.enabled = false;
 
-		currentBall = GameObject.Instantiate(cannonBallPrefab, transform.position, transform.rotation).GetComponent<CannonBall>();
+		currentBall = cannonBallPool.Recycle(); // GameObject.Instantiate(cannonBallPrefab, transform.position, transform.rotation).GetComponent<CannonBall>();
+		currentBall.transform.position = transform.position;
+		currentBall.transform.rotation = transform.rotation;
 		currentBall.transform.localScale = transform.localScale;
+
+		currentBall.Pool = cannonBallPool;
 
 		currentBall.SetTrajectory(initialVelocity, horizontalForce);
 

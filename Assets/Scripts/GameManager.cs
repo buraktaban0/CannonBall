@@ -18,7 +18,10 @@ public class GameManager : MonoBehaviour
 
 	private bool isScoreSystemActive = false; // To prevent increasing the score due to initial drop of cubes
 
-
+	private void Awake()
+	{
+		score.Value = 0;
+	}
 
 	private void OnEnable()
 	{
